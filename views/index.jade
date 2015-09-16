@@ -3,14 +3,19 @@ block body
   div#main
     h1= title
 
-    div#show-repos
-
-    form(action="/clone", method="post", id="form-clone")
-      p Clone repository 
-      label Repository URL (Git)
-        input(type="text", name="repo")
-
-      button(type="submit") Clone!
+    div.clearfix
+      div.left.left-column
+        div#show-repos
+      div.right.right-column
+        form(action="/clone", method="post", id="form-clone", class="clone-form")
+          p.title Clone repository 
+          div.form-row
+            label(for="repo") Repository name (https://bitbucket.org/soudigital/{name}.git)
+          div.form-row.input-row
+            input(type="text", id="repo", name="repo", class="form-control", placeholder="Repository name")
+          div.text-center
+            button(type="submit", class="btn btn-lg btn-default") 
+              | Clone!
 block scripts
   script(type="text/javascript", src="/javascripts/api.js")
   script(type="text/javascript", src="/javascripts/main.js")

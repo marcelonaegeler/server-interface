@@ -12,7 +12,7 @@ module.exports = function() {
   };
 
   router.get('/', function(req, res) {
-    res.render('index', { title: 'Hello world!' });
+    res.render('index', { title: 'Server repositories' });
   });
 
   router.get('/list', function(req, res) {
@@ -24,7 +24,7 @@ module.exports = function() {
 
   router.post('/clone', function(req, res) {
     if(!req.body.repo) return res.status(500).send(new Error('Invalid repository.'));
-    
+
     var command = [ 'cd ', dir, ' && git clone ', req.body.repo ].join('');
     exec(command, function(err, stdout, stderr) {
       var response = {};
@@ -33,7 +33,7 @@ module.exports = function() {
       res.status(200).send(response);
     });
   });
-  
+
   router.get('/pull', function(req, res) {
     if(!req.query.repo) return res.status(500).send(new Error('Invalid repository.'));
 

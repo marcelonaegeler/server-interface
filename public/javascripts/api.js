@@ -66,9 +66,19 @@ var api = (function() {
 		request.send(data);
 	};
 
+  var layout = function(str) {
+    return function(data) {
+      for(var i in data) {
+        str = str.replace(new RegExp('{'+ i +'}', 'g'), data[i]);
+      }
+      return str;
+    };
+  };
+
 	return {
 		ajax: ajax
 		, arrayPop: arrayPop
 		, generateId: generateId
+    , layout: layout
 	};
 })();

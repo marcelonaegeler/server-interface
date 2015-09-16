@@ -1,17 +1,20 @@
 ;!function() {
   var form = document.getElementById('form-clone');
   var showRepos = document.getElementById('show-repos');
+  
+  var layout = {
+    list: '<ul class="ul">{items}</ul>'
+    , listItem: '<li>{name} <button type="button" class="btn btn-sm btn-default" onclick="window.gitPull(\'{name}\')">git pull</button></li>'
+    , emptyListItem: '<li>Não foram encontrados repositórios.</li>'
+  };
 
   form.addEventListener('submit', function(event) {
     event.preventDefault();
-    var dataElements = form.elements;
     api.ajax({
       url: form.action
       , method: form.method
       , data: {
-        repo: dataElements.repo
-        , username: dataElements.username
-        , password: dataElements.password
+        repo: form.elements.repo
       }
       , success: function(data) {
         console.log(data);
@@ -20,24 +23,23 @@
     return false;
   });
 
-  var repos = [];
-  api.ajax({
-    url: '/list'
-    , method: 'GET'
-    , success: function(data) {
-      if(!data.length)
-        repos.push('<p>Não foram encontrados repositórios.</p>');
-      for(var i = 0; i < data.length; i++)
-        repos.push([
-          '<p>'
-          , data[i]
-          , ' - <button type="button" onclick="window.gitPull(\''
-          , data[i]
-          , '\');">git pull</button></p>' ].join(''));
+  var localRepos = (function() {
+    var repos = [];
+    api.ajax({
+      url: '/list'
+      , method: 'GET'
+      , success: function(data) {
+        var items = [];
+        if(!data.length)
+          items.push(layout.emptyListItem);
+        for(var i = 0; i < data.length; i++)
+          items.push(api.layout(layout.listItem)({ name: data[i] }));
 
-      showRepos.innerHTML = repos.join('');
-    }
-  });
+        items = api.layout(layout.list)({ items: items.join('') });
+        showRepos.innerHTML = items;
+      }
+    });
+  })();
 
   var gitPull = function(repo) {
     api.ajax({

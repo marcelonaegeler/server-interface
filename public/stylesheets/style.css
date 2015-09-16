@@ -1,0 +1,112 @@
+/*
+ * Default
+ */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  color: #333;
+  background-color: #eee;
+}
+
+.clearfix {
+  overflow: auto;
+}
+.left {
+  float: left;
+}
+.right {
+  float: right;
+}
+
+/*
+ * Styles
+ */
+#main {
+  margin: 12px auto;
+  width: 1000px;
+  padding: 12px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+h1 {
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+}
+
+.left-column {
+  width: 560px;
+}
+.right-column {
+  width: 400px;
+}
+.text-center {
+  text-align: center;
+}
+
+/*
+ * Forms
+ */
+.input-row {
+  margin-right: 22px;
+}
+.form-row {
+  margin-bottom: 15px;
+}
+.form-control {
+  display: block;
+  padding: 10px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+.btn {
+  display: inline-block;  
+  border: none;
+}
+.btn-sm {
+  padding: 5px 8px;
+}
+.btn-lg {
+  padding: 8px 12px;
+}
+.btn-default {
+  background-color: #333;
+  color: #fff;
+}
+
+/*
+ * Left side
+ */
+.ul {
+  list-style: none;
+}
+.ul li {
+  padding: 5px;
+  line-height: 25px;
+}
+.ul li:nth-child(odd) {
+  background-color: #eee;
+}
+
+/*
+ * Right side
+ */
+.clone-form {
+  padding: 10px;
+  background-color: #efefef;
+}
+.clone-form .title {
+  font-size: 16px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+}
