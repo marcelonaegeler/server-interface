@@ -4,20 +4,39 @@
   
   var layout = {
     list: '<ul class="ul">{items}</ul>'
-    , listItem: '<li>{name} <button type="button" class="btn btn-sm btn-default" onclick="window.gitPull(\'{name}\')">git pull</button></li>'
+    , listItem: [ '<li>{name} <button type="button" class="btn btn-sm btn-default" onclick="'
+        , 'window.gitPull(\'{name}\')">Git pull</button>'
+        , ' <button type="button" class="btn btn-sm btn-default" onclick="window.install(\'{name}\')">Install</button></li>' ].join('')
     , emptyListItem: '<li>Não foram encontrados repositórios.</li>'
   };
 
   form.addEventListener('submit', function(event) {
     event.preventDefault();
+    var btn = form.querySelector('[type="submit"]');
+    btn.setAttribute('disabled', 'disabled');
+    btn.innerHTML = 'Clonando...';
+    var message = form.querySelector('.message');
+
     api.ajax({
       url: form.action
       , method: form.method
       , data: {
-        repo: form.elements.repo
+        repo: form.elements.repo.value
       }
       , success: function(data) {
-        console.log(data);
+        if(!data.status) {
+          message.innerHTML = "Repositório clonado.";
+          localRepos();
+        } else {
+          message.innerHTML = "Erro ao clonar o repositório, o nome está correto?";
+        }
+        btn.removeAttribute('disabled');
+        btn.innerHTML = 'Clonar!';
+      }
+      , error: function() {
+        message.innerHTML = "Erro ao clonar o repositório, o nome está correto?";
+        btn.removeAttribute('disabled');
+        btn.innerHTML = 'Clonar!';
       }
     });
     return false;

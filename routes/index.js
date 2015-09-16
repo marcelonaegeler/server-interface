@@ -28,8 +28,10 @@ module.exports = function() {
     var command = [ 'cd ', dir, ' && git clone ', req.body.repo ].join('');
     exec(command, function(err, stdout, stderr) {
       var response = {};
-      if(err) response['status'] = 1;
-      else response['status'] = 0;
+      if(err) {
+        response['status'] = 1;
+        response['err'] = err;
+      } else response['status'] = 0;
       res.status(200).send(response);
     });
   });

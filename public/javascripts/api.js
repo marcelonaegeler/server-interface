@@ -29,7 +29,7 @@ var api = (function() {
 	};
 
 	var ajax = function(options) {
-		var method = options.method || 'GET'
+		var method = options.method.toUpperCase() || 'GET'
 			, url = options.url || null
 			, success = options.success
 			, error = options.error
