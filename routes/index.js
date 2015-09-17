@@ -2,15 +2,46 @@ module.exports = function() {
   var express = require('express')
     , router = express.Router()
     , fs = require('fs')
-    , dir = '/home/marcelo/Projects'
     , exec = require('child_process').exec
     ;
 
+
+  /*
+  * Folders configs
+  */
+  var defaultFolders = [
+    { value: 0, pwd: '/home/marcelo/Projects' }
+    , { value: 1, pwd: '/home/marcelo/Node' }
+  ];
+
+  var folder = (function() {
+    var selected;
+    var setFolder = function(code) {
+      for(var i = 0; i < defaultFolders.length; i++) {
+        if(defaultFolders[i].value == +code)
+          selected = defaultFolders[i].pwd;
+      }
+    };
+
+    var getFolder = function() {
+      return selected;
+    };
+
+    return {
+      setFolder: setFolder
+      , getFolder: getFolder
+    };
+  })();
+
+  /*
+  * Bitbucket user settings
+  */
+  // Default user
   var defaultUser = {
     username: 'username'
     , password: 'password'
   };
-
+  // Config file
   var bitbucketFile = function(first) {
     fs.readFile('.bitbucketinfo', 'utf8', function(err, doc) {
       if(err && err.code == 'ENOENT') {
@@ -27,25 +58,35 @@ module.exports = function() {
       }
     });
   };
-
   bitbucketFile(true);
 
+
+  /*
+  * Routes
+  */
+  // The view
   router.get('/', function(req, res) {
-    res.render('index', { title: 'Server repositories' });
+    res.render('index', { title: 'Server repositories', folders: defaultFolders });
   });
 
+  /*
+  * Ajax routes
+  */
+  // List local repositories
   router.get('/list', function(req, res) {
-    fs.readdir(dir, function(err, files) {
+    folder.setFolder(req.query.folder);
+    fs.readdir(folder.getFolder(), function(err, files) {
       if(err) throw err;
       res.status(200).send(files);
     });
   });
 
+  // Clone repository
   router.post('/clone', function(req, res) {
     if(!req.body.repo) return res.status(500).send(new Error('Invalid repository.'));
 
     var repo = [ 'https://', defaultUser.username, ':', defaultUser.password, '@bitbucket.org/soudigital/', req.body.repo, '.git' ].join('');
-    var command = [ 'cd ', dir, ' && git clone ', repo ].join('');
+    var command = [ 'cd ', folder.getFolder(), ' && git clone ', repo ].join('');
     exec(command, function(err, stdout, stderr) {
       var response = {};
       if(err) {
@@ -56,10 +97,11 @@ module.exports = function() {
     });
   });
 
+  // Pull repository
   router.get('/pull', function(req, res) {
     if(!req.query.repo) return res.status(500).send(new Error('Invalid repository.'));
 
-    var cdCommand = [ 'cd ', dir, '/', req.query.repo ].join('');
+    var cdCommand = [ 'cd ', folder.getFolder(), '/', req.query.repo ].join('');
 
     exec(cdCommand +' && git pull', function(err, stdout, stderr) {
       if(stdout)
@@ -67,11 +109,12 @@ module.exports = function() {
     });
   });
 
+  // Install Bower and Composer
   router.get('/install', function(req, res) {
     if(!req.query.repo) return res.status(500).send(new Error('Invalid repository.'));
 
     var repo = req.query.repo;
-    var cdCommand = [ 'cd ', dir, '/', repo ].join('');
+    var cdCommand = [ 'cd ', folder.getFolder(), '/', repo ].join('');
 
     exec(cdCommand +' && composer install && bower install', function(err, stdout, stderr) {
       if(err)
@@ -79,8 +122,6 @@ module.exports = function() {
       if(stdout)
         return res.send({ status: 0, message: 'Dependências instaladas.' });
     });
-
-    //res.send({ status: 0 });
   });
 
   return router;

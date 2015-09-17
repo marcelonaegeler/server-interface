@@ -5,6 +5,10 @@ block body
 
     div.clearfix
       div.left.left-column
+        select#folder-select
+          for folder in folders
+            option(value="#{folder.value}") #{folder.pwd}
+          
         div#show-repos
       div.right.right-column
         form(action="/clone", method="post", id="form-clone", class="clone-form")
