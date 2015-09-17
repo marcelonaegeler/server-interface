@@ -1,12 +1,12 @@
 ;!function() {
   var form = document.getElementById('form-clone');
   var showRepos = document.getElementById('show-repos');
-  
+
   var layout = {
     list: '<ul class="ul">{items}</ul>'
     , listItem: [ '<li>{name} <button type="button" class="btn btn-sm btn-default" onclick="'
         , 'window.gitPull(\'{name}\')">Git pull</button>'
-        , ' <button type="button" class="btn btn-sm btn-default" onclick="window.install(\'{name}\')">Install</button></li>' ].join('')
+        , ' <button type="button" class="btn btn-sm btn-default" onclick="window.installDependencies(\'{name}\')">Install</button></li>' ].join('')
     , emptyListItem: '<li>Não foram encontrados repositórios.</li>'
   };
 
@@ -42,8 +42,27 @@
     return false;
   });
 
+  var status = (function() {
+    var el = document.querySelector('.statusText');
+
+    var setMessage = function(text) {
+      el.innerHTML = text;
+    };
+
+    var ready = function() {
+      el.innerHTML = 'Pronto.';
+    };
+
+    return {
+      setMessage: setMessage
+      , ready: ready
+    };
+  })();
+
   var localRepos = (function() {
     var repos = [];
+    status.setMessage('Carregando repositórios...');
+
     api.ajax({
       url: '/list'
       , method: 'GET'
@@ -56,11 +75,13 @@
 
         items = api.layout(layout.list)({ items: items.join('') });
         showRepos.innerHTML = items;
+        status.ready();
       }
     });
   })();
 
   var gitPull = function(repo) {
+    status.setMessage([ 'Executando "git pull" em ', repo, '...' ].join(''));
     api.ajax({
       url: '/pull'
       , method: 'GET'
@@ -68,10 +89,25 @@
         repo: repo
       }
       , success: function(data) {
-        console.log(data);
+        status.setMessage([ 'Git pull executado (', repo,'): ', data.message ].join(''));
+      }
+    });
+  };
+
+  var installDependencies = function(repo) {
+    status.setMessage([ 'Instalando dependências em ', repo, '...' ].join(''));
+    api.ajax({
+      url: '/install'
+      , method: 'GET'
+      , data: {
+        repo: repo
+      }
+      , success: function(data) {
+          status.setMessage([ data.message ].join(''));
       }
     });
   };
 
   window.gitPull = gitPull;
+  window.installDependencies = installDependencies;
 }();
